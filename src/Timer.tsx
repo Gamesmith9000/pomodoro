@@ -44,12 +44,6 @@ const addLeadingZero = (num: number) => {
     return num < 10 ? '0' + numAsString : numAsString;
 }
 
-interface RemaingTimes {
-    fullMinutes: number;
-    seconds: number;
-    secondsLessMinutes: number;
-}
-
 interface TimerProps {
     duration: number;
     initiallyInSittingPosition: boolean;
