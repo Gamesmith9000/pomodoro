@@ -2,13 +2,22 @@ import React, { useState } from 'react';
 import './TimerScheduler.css';
 import { Timer } from './Timer';
 
+export interface TimerPeriod {
+	changePosition: boolean;
+	durationMinutes: number;
+	isBreakPeriod: boolean;
+}
+
+export enum SeatPosition {
+	Sitting,
+	Standing
+}
+
 export const TimerScheduler = () => {
-  function onCompleteTimerCountdown () {
-    console.log("Timer finished");
-  }
-  
-  const [initiallyInSittingPosition, setInitiallyInSittingPosition] = useState(false);
+	const [initialSeatPosition, setInitialSeatPosition] = useState(SeatPosition.Sitting);
   const [isRunningTimer, setIsRunningTimer] = useState(false);
+  const [currentPeriodIndex, setCurrentPeriodIndex] = useState(0);
+  const [inSittingPosition, setInSittingPosition] = useState(false);
 
   function toggleTimerRunWithButton (mouseEvent: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     mouseEvent.preventDefault();
@@ -16,7 +25,7 @@ export const TimerScheduler = () => {
   }
 
   return (
-    <div className="App">
+	<div className="TimerScheduler">
       <header>
         Timer App
       </header>
@@ -25,11 +34,25 @@ export const TimerScheduler = () => {
       </button>
       <Timer
         duration={5}
-        initiallyInSittingPosition={true}
+		initalSeatPosition={initialSeatPosition}
         isRunning={isRunningTimer}
-        onCompleteCountdown={onCompleteTimerCountdown}
-        positionMatchesInitial={true}
+			  timerPeriods={timerPeriods}
+			  initialPeriodIndex={0}
       />
     </div>
   );
 }
+
+const timerPeriods: TimerPeriod[] = [
+	{ changePosition: false, durationMinutes: 25, isBreakPeriod: false },
+	{ changePosition: false, durationMinutes: 5, isBreakPeriod: true },
+	{ changePosition: true, durationMinutes: 25, isBreakPeriod: false },
+	{ changePosition: false, durationMinutes: 5, isBreakPeriod: true },
+	{ changePosition: true, durationMinutes: 25, isBreakPeriod: false },
+	{ changePosition: false, durationMinutes: 5, isBreakPeriod: true },
+	{ changePosition: true, durationMinutes: 25, isBreakPeriod: false },
+	{ changePosition: false, durationMinutes: 5, isBreakPeriod: true },
+	{ changePosition: false, durationMinutes: 10, isBreakPeriod: false },
+	{ changePosition: true, durationMinutes: 10, isBreakPeriod: true }
+];
+

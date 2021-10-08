@@ -1,9 +1,10 @@
 import React, { FC, MutableRefObject, useRef, useState } from 'react';
+import { SeatPosition, TimerPeriod } from './TimerScheduler';
 
 export const Timer:FC<TimerProps> = (props) => {
     const intervalId: MutableRefObject<number> = useRef(0);
     const [currentTime, setCurrentTime] = useState(0);
-    const [hasCompleted, setHasCompleted] = useState(false);
+    const [periodIndex, setPeriodIndex] = useState(props.initialPeriodIndex);
 
     const remainingSeconds: number = props.duration - currentTime;
     const remainingFullMinutes: number = Math.floor(remainingSeconds / 60);
@@ -14,11 +15,13 @@ export const Timer:FC<TimerProps> = (props) => {
         intervalId.current = 0;
     }
 
-    if(hasCompleted === false) {
+    const hasCompletedPeriod: boolean = currentTime >= props.duration;
+
+    // OLD LOGIC BELOW:
+	// NOTE: replaced 'hasCompleted' on line below with 'hasCompletedPeriod', which makes logic outdated
+	if (hasCompletedPeriod === false) {
         if(currentTime >= props.duration) {
-            props.onCompleteCountdown();
             removeIntervalData();
-            setHasCompleted(true);
         }
         else {
             if(props.isRunning === true && intervalId.current === 0) {
@@ -46,8 +49,8 @@ const addLeadingZero = (num: number) => {
 
 interface TimerProps {
     duration: number;
-    initiallyInSittingPosition: boolean;
+    initalSeatPosition: SeatPosition;
+    initialPeriodIndex: number;
     isRunning: boolean;
-    onCompleteCountdown(): any,
-    positionMatchesInitial: boolean;
+    timerPeriods: TimerPeriod[]
 }
