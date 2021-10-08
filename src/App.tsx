@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
 import './App.css';
-import { Timer } from './Timer';
 import { TimerScheduler } from './TimerScheduler';
 
 function App() {
