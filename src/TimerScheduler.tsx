@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import './App.css';
+import './TimerScheduler.css';
 import { Timer } from './Timer';
-import TimerScheduler from './TimerScheduler';
 
-function App() {
+export const TimerScheduler = () => {
   function onCompleteTimerCountdown () {
     console.log("Timer finished");
   }
@@ -21,9 +20,16 @@ function App() {
       <header>
         Timer App
       </header>
-      <TimerScheduler />
+      <button onClick={toggleTimerRunWithButton}>
+        { isRunningTimer === true ? '⏸' : '▶️' }
+      </button>
+      <Timer
+        duration={5}
+        initiallyInSittingPosition={true}
+        isRunning={isRunningTimer}
+        onCompleteCountdown={onCompleteTimerCountdown}
+        positionMatchesInitial={true}
+      />
     </div>
   );
 }
-
-export default App;
