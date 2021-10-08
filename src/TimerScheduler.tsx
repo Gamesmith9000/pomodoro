@@ -15,32 +15,32 @@ export enum SeatPosition {
 
 export const TimerScheduler = () => {
 	const [initialSeatPosition, setInitialSeatPosition] = useState(SeatPosition.Sitting);
-  const [isRunningTimer, setIsRunningTimer] = useState(false);
-  const [currentPeriodIndex, setCurrentPeriodIndex] = useState(0);
-  const [inSittingPosition, setInSittingPosition] = useState(false);
+	const [isRunningTimer, setIsRunningTimer] = useState(false);
+	const [currentPeriodIndex, setCurrentPeriodIndex] = useState(0);
+	const [inSittingPosition, setInSittingPosition] = useState(false);
 
-  function toggleTimerRunWithButton (mouseEvent: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    mouseEvent.preventDefault();
-    setIsRunningTimer(!isRunningTimer);
-  }
+	function toggleTimerRunWithButton(mouseEvent: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+		mouseEvent.preventDefault();
+		setIsRunningTimer(!isRunningTimer);
+	}
 
-  return (
-	<div className="TimerScheduler">
-      <header>
-        Timer App
-      </header>
-      <button onClick={toggleTimerRunWithButton}>
-        { isRunningTimer === true ? '⏸' : '▶️' }
-      </button>
-      <Timer
-        duration={5}
-		initalSeatPosition={initialSeatPosition}
-        isRunning={isRunningTimer}
-			  timerPeriods={timerPeriods}
-			  initialPeriodIndex={0}
-      />
-    </div>
-  );
+	return (
+		<div className="TimerScheduler">
+			<header>
+				Timer App
+			</header>
+			<button onClick={toggleTimerRunWithButton}>
+				{isRunningTimer === true ? '⏸' : '▶️'}
+			</button>
+			<Timer
+				duration={5}
+				initalSeatPosition={initialSeatPosition}
+				isRunning={isRunningTimer}
+				timerPeriods={timerPeriods}
+				initialPeriodIndex={0}
+			/>
+		</div>
+	);
 }
 
 const timerPeriods: TimerPeriod[] = [
