@@ -1,28 +1,30 @@
-import React, { useState } from 'react';
+import React, { MutableRefObject, useRef, useState } from 'react';
 import './TimerScheduler.css';
 import { Timer } from './Timer';
 
 export enum SeatPosition {
-	Sitting,
-	Standing
+	Sit,
+	Stand
 }
 
 export interface TimerPeriod {
-	changePosition: boolean;
 	durationMinutes: number;
 	isBreakPeriod: boolean;
+	seatPosition: SeatPosition;
 }
 
 export const TimerScheduler = () => {
-	const [initialSeatPosition, setInitialSeatPosition] = useState(SeatPosition.Sitting);
+	const [initialSeatPosition, setInitialSeatPosition] = useState(SeatPosition.Stand);
 	const [isRunningTimer, setIsRunningTimer] = useState(false);
 	const [currentPeriodIndex, setCurrentPeriodIndex] = useState(0);
 	const [seatPosition, setSeatPosition] = useState(initialSeatPosition);
 
-	function toggleTimerRunWithButton(mouseEvent: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+	const toggleTimerRunWithButton = (mouseEvent: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		mouseEvent.preventDefault();
 		setIsRunningTimer(!isRunningTimer);
 	}
+
+	const timerPeriods: TimerPeriod[] = createTimerPeriodsList(initialSeatPosition);
 
 	return (
 		<div className="TimerScheduler">
@@ -31,25 +33,27 @@ export const TimerScheduler = () => {
 			</button>
 			<Timer
 				duration={5}
+				initialPeriodIndex={0}
 				initalSeatPosition={initialSeatPosition}
 				isRunning={isRunningTimer}
 				timerPeriods={timerPeriods}
-				initialPeriodIndex={0}
 			/>
 		</div>
 	);
 }
 
-const timerPeriods: TimerPeriod[] = [
-	{ changePosition: false, durationMinutes: 25, isBreakPeriod: false },
-	{ changePosition: false, durationMinutes: 5,  isBreakPeriod: true },
-	{ changePosition: true,  durationMinutes: 25, isBreakPeriod: false },
-	{ changePosition: false, durationMinutes: 5,  isBreakPeriod: true },
-	{ changePosition: true,  durationMinutes: 25, isBreakPeriod: false },
-	{ changePosition: false, durationMinutes: 5,  isBreakPeriod: true },
-	{ changePosition: true,  durationMinutes: 25, isBreakPeriod: false },
-	{ changePosition: false, durationMinutes: 5,  isBreakPeriod: true },
-	{ changePosition: false, durationMinutes: 10, isBreakPeriod: false },
-	{ changePosition: true,  durationMinutes: 10, isBreakPeriod: true }
-];
-
+const createTimerPeriodsList = (initialPosition: SeatPosition) : TimerPeriod[] => {
+	const alternatePosition: SeatPosition = initialPosition === SeatPosition.Sit ? SeatPosition.Stand: SeatPosition.Sit;
+	return [
+		{ durationMinutes: 25, isBreakPeriod: false, seatPosition: initialPosition },
+		{ durationMinutes: 5,  isBreakPeriod: true,  seatPosition: initialPosition },
+		{ durationMinutes: 25, isBreakPeriod: false, seatPosition: alternatePosition },
+		{ durationMinutes: 5,  isBreakPeriod: true,  seatPosition: alternatePosition },
+		{ durationMinutes: 25, isBreakPeriod: false, seatPosition: initialPosition },
+		{ durationMinutes: 5,  isBreakPeriod: true,  seatPosition: initialPosition },
+		{ durationMinutes: 25, isBreakPeriod: false, seatPosition: alternatePosition },
+		{ durationMinutes: 5,  isBreakPeriod: true,  seatPosition: alternatePosition },
+		{ durationMinutes: 10, isBreakPeriod: false, seatPosition: initialPosition },
+		{ durationMinutes: 10, isBreakPeriod: true,  seatPosition: alternatePosition }
+	];
+}
