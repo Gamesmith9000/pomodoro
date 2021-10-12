@@ -1,5 +1,5 @@
 import './App.css';
-import { TimerScheduler } from './TimerScheduler';
+import { SeatPosition, TimerScheduler } from './TimerScheduler';
 
 function App() {
 	return (
@@ -7,7 +7,9 @@ function App() {
 			<header>
 				Timer App
 			</header>
-			<TimerScheduler />
+			<TimerScheduler
+				initialSeatPosition={SeatPosition.Stand}
+			/>
 		</div>
 	);
 }

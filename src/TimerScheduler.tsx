@@ -1,10 +1,10 @@
-import React, { MutableRefObject, useRef, useState } from 'react';
+import React, { FC, useState } from 'react';
 import './TimerScheduler.css';
 import { Timer } from './Timer';
 
 export enum SeatPosition {
-	Sit,
-	Stand
+	Sit = "Sit",
+	Stand = "Stand"
 }
 
 export interface TimerPeriod {
@@ -13,30 +13,33 @@ export interface TimerPeriod {
 	seatPosition: SeatPosition;
 }
 
-export const TimerScheduler = () => {
-	const [initialSeatPosition, setInitialSeatPosition] = useState(SeatPosition.Stand);
+export const TimerScheduler: FC<TimerSchedulerProps> = (props) => {
 	const [isRunningTimer, setIsRunningTimer] = useState(false);
 	const [currentPeriodIndex, setCurrentPeriodIndex] = useState(0);
-	const [seatPosition, setSeatPosition] = useState(initialSeatPosition);
+
+	const timerPeriods: TimerPeriod[] = createTimerPeriodsList(props.initialSeatPosition);
+	const seatPosition: SeatPosition = timerPeriods[currentPeriodIndex].seatPosition;
 
 	const toggleTimerRunWithButton = (mouseEvent: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		mouseEvent.preventDefault();
 		setIsRunningTimer(!isRunningTimer);
 	}
 
-	const timerPeriods: TimerPeriod[] = createTimerPeriodsList(initialSeatPosition);
+	const handlePeriodCompleted = () => {
+		setCurrentPeriodIndex(current => current + 1);
+	}
 
 	return (
 		<div className="TimerScheduler">
+			<div>Position: {seatPosition}</div>
 			<button onClick={toggleTimerRunWithButton}>
 				{isRunningTimer === true ? '⏸' : '▶️'}
 			</button>
 			<Timer
-				duration={5}
-				initialPeriodIndex={0}
-				initalSeatPosition={initialSeatPosition}
+				currentPeriodIndex={currentPeriodIndex}
+				durationSeconds={timerPeriods[currentPeriodIndex].durationMinutes * 60}
 				isRunning={isRunningTimer}
-				timerPeriods={timerPeriods}
+				onPeriodComplete={handlePeriodCompleted}
 			/>
 		</div>
 	);
@@ -56,4 +59,8 @@ const createTimerPeriodsList = (initialPosition: SeatPosition) : TimerPeriod[] =
 		{ durationMinutes: 10, isBreakPeriod: false, seatPosition: initialPosition },
 		{ durationMinutes: 10, isBreakPeriod: true,  seatPosition: alternatePosition }
 	];
+}
+
+interface TimerSchedulerProps {
+	initialSeatPosition: SeatPosition;
 }

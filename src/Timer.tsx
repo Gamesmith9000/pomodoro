@@ -1,37 +1,42 @@
-import React, { FC, MutableRefObject, useRef, useState } from 'react';
-import { SeatPosition, TimerPeriod } from './TimerScheduler';
+import React, { FC, MutableRefObject, useEffect, useRef, useState } from 'react';
 
 export const Timer: FC<TimerProps> = (props) => {
 	const intervalId: MutableRefObject<number> = useRef(0);
+	const priorPeriodIndex: MutableRefObject<number> = useRef(0);
 	const [currentTime, setCurrentTime] = useState(0);
-	const [periodIndex, setPeriodIndex] = useState(props.initialPeriodIndex);
 
-	const remainingSeconds: number = props.duration - currentTime;
+	const exactRemainingSeconds = props.durationSeconds - currentTime;
+	const remainingSeconds: number = exactRemainingSeconds >= 0 ? exactRemainingSeconds : 0;
 	const remainingFullMinutes: number = Math.floor(remainingSeconds / 60);
 	const remainingSecondsLessMinutes: number = remainingSeconds - (remainingFullMinutes * 60);
+
+	const hasCompletedPeriod: boolean = currentTime > props.durationSeconds;
+	const periodHasChanged = priorPeriodIndex.current !== props.currentPeriodIndex;
 
 	const removeIntervalData = () => {
 		window.clearInterval(intervalId.current);
 		intervalId.current = 0;
 	}
 
-	const hasCompletedPeriod: boolean = currentTime >= props.duration;
-
-	// OLD LOGIC BELOW:
-	// NOTE: replaced 'hasCompleted' on line below with 'hasCompletedPeriod', which makes logic outdated
-	if (hasCompletedPeriod === false) {
-		if (currentTime >= props.duration) {
-			removeIntervalData();
+	useEffect(() => {
+		if (periodHasChanged === true) {
+			priorPeriodIndex.current = props.currentPeriodIndex;
+			setCurrentTime(0);
 		}
 		else {
-			if (props.isRunning === true && intervalId.current === 0) {
-				intervalId.current = window.setInterval(() => { setCurrentTime(current => current + 1) }, 1000);
+			if (hasCompletedPeriod === false) {
+				if (props.isRunning === true && intervalId.current === 0) {
+					intervalId.current = window.setInterval(() => { setCurrentTime(current => current + 1) }, 1000); ////////////////
+				}
+				else if (props.isRunning === false && intervalId.current !== 0) {
+					removeIntervalData();
+				}
 			}
-			else if (props.isRunning === false && intervalId.current !== 0) {
-				removeIntervalData();
+			else {
+				props.onPeriodComplete();
 			}
 		}
-	}
+	});
 
 	return (
 		<div>
@@ -48,9 +53,8 @@ const addLeadingZero = (num: number) => {
 }
 
 interface TimerProps {
-	duration: number;
-	initalSeatPosition: SeatPosition;
-	initialPeriodIndex: number;
+	currentPeriodIndex: number
+	durationSeconds: number;
 	isRunning: boolean;
-	timerPeriods: TimerPeriod[]
+	onPeriodComplete(): void;
 }
