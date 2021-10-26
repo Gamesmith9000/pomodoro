@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react';
 import './TimerScheduler.css';
 import { Timer } from './Timer';
+import UserSettings from './UserSettings';
 
 export enum SeatPosition {
 	Sit = "Sit",
@@ -18,34 +19,36 @@ const notificationStrings: NotificationStrings = {
 	breakStart: "Break Time",
 	changeToSit: "Change Position: Sit Down",
 	changeToStand: "Change Position: Stand Up",
-	finalPeriodEnd: "Final Period Ended.",
-	periodEnd: "Period Ended."
+	finalPeriodEnd: "Final Period Ended",
+	title: "Period Ended"
 }
 
 export const TimerScheduler: FC<TimerSchedulerProps> = (props) => {
 	const [isRunningTimer, setIsRunningTimer] = useState(false);
 	const [currentPeriodIndex, setCurrentPeriodIndex] = useState(0);
+	const [schedulerStatus, setSchedulerStatus] = useState(SchedulerStatus.AwaitingStart);
 
 	const timerPeriods: TimerPeriod[] = createTimerPeriodsList(props.initialSeatPosition);
 	const seatPosition: SeatPosition = timerPeriods[currentPeriodIndex].seatPosition;
 
 	const toggleTimerRunWithButton = (mouseEvent: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		mouseEvent.preventDefault();
+		if(schedulerStatus === SchedulerStatus.AwaitingStart) {
+			setSchedulerStatus(SchedulerStatus.Engaged);
+		}
 		setIsRunningTimer(!isRunningTimer);
 	}
 
 	const handlePeriodCompleted = () => {
 		const finalPeriodCompleted = currentPeriodIndex === timerPeriods.length -1;
 
-		if (Notification.permission === "granted") {
-			let notificationMessage: string;
+		if (Notification?.permission === "granted") {
+			let notificationMessage: string = "";
 			const newline: string = '\n';
 
 			if(finalPeriodCompleted === false) {
 				const endingPeriod: TimerPeriod = timerPeriods[currentPeriodIndex];
 				const newPeriod: TimerPeriod = timerPeriods[currentPeriodIndex + 1];
-
-				notificationMessage = notificationStrings.periodEnd + `(index ${currentPeriodIndex})`; // alt. Period names: Section/Timer/Pomodoro/Cycle
 
 				if(endingPeriod.seatPosition !== newPeriod.seatPosition) {
 					notificationMessage += newline;
@@ -60,28 +63,35 @@ export const TimerScheduler: FC<TimerSchedulerProps> = (props) => {
 				notificationMessage = notificationStrings.finalPeriodEnd;
 			}
 			
-			const notification = new Notification(notificationMessage);
+			notificationMessage +=  newline + `(index ${currentPeriodIndex})`;
+			const notification = new Notification(notificationStrings.title, { body: notificationMessage });
 		}
 
 		if(finalPeriodCompleted === false) {
 			setCurrentPeriodIndex(current => current + 1);
 		}
 		else {
+			if(schedulerStatus === SchedulerStatus.Engaged) {
+				setSchedulerStatus(SchedulerStatus.FullyCompleted);
+			}
 			setIsRunningTimer(false);
 			setCurrentPeriodIndex(0);
 		}
 	}
-
+	
 	return (
 		<div className="TimerScheduler">
 			<div>Position: {seatPosition}</div>
+			{ schedulerStatus !== SchedulerStatus.Engaged &&
+				<UserSettings />
+			}
 			<button onClick={toggleTimerRunWithButton}>
 				{isRunningTimer === true ? '⏸' : '▶️'}
 			</button>
 			<Timer
 				currentPeriodIndex={currentPeriodIndex}
 				durationSeconds={timerPeriods[currentPeriodIndex].durationMinutes * 60}
-				isRunning={isRunningTimer}
+				isRunning={schedulerStatus === SchedulerStatus.Engaged ? isRunningTimer : false}
 				onPeriodComplete={handlePeriodCompleted}
 			/>
 		</div>
@@ -104,6 +114,12 @@ const createTimerPeriodsList = (initialPosition: SeatPosition) : TimerPeriod[] =
 	];
 }
 
+enum SchedulerStatus {
+	AwaitingStart = "AwaitingStart",
+	Engaged = "Engaged",
+	FullyCompleted = "FullyCompleted"
+}
+
 interface TimerSchedulerProps {
 	initialSeatPosition: SeatPosition;
 }
@@ -114,5 +130,5 @@ interface NotificationStrings {
 	changeToSit: string;
 	changeToStand: string;
 	finalPeriodEnd: string;
-	periodEnd: string;
+	title: string;
 }
