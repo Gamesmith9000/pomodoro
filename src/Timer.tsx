@@ -5,13 +5,13 @@ export const Timer: FC<TimerProps> = (props) => {
 	const priorPeriodIndex: MutableRefObject<number> = useRef(0);
 	const [currentTime, setCurrentTime] = useState(0);
 
-	const exactRemainingSeconds = props.durationSeconds - currentTime;
+	const exactRemainingSeconds: number = props.durationSeconds - currentTime;
 	const remainingSeconds: number = exactRemainingSeconds >= 0 ? exactRemainingSeconds : 0;
 	const remainingFullMinutes: number = Math.floor(remainingSeconds / 60);
 	const remainingSecondsLessMinutes: number = remainingSeconds - (remainingFullMinutes * 60);
 
 	const hasCompletedPeriod: boolean = currentTime > props.durationSeconds;
-	const periodHasChanged = priorPeriodIndex.current !== props.currentPeriodIndex;
+	const periodHasChanged: boolean = priorPeriodIndex.current !== props.currentPeriodIndex;
 
 	const removeIntervalData = () => {
 		window.clearInterval(intervalId.current);
@@ -48,7 +48,7 @@ export const Timer: FC<TimerProps> = (props) => {
 }
 
 const addLeadingZero = (num: number) => {
-	const numAsString = String(num);
+	const numAsString: string = String(num);
 	return num < 10 ? '0' + numAsString : numAsString;
 }
 
