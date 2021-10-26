@@ -1,5 +1,5 @@
 import React, { FC, MutableRefObject, useEffect, useRef, useState } from 'react';
-import './Timer.css';
+import '../styles/Timer.css';
 
 export const Timer: FC<TimerProps> = (props) => {
 	const intervalId: MutableRefObject<number> = useRef(0);

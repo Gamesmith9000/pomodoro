@@ -1,4 +1,5 @@
 import React, { FC, useState } from 'react';
+import '../styles/Notifier.css';
 
 export const Notifier: FC<NotifierProps> = (props) => {
 	const [currentPermission, setCurrentPermission] = useState(Notification.permission);

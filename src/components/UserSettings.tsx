@@ -1,5 +1,5 @@
 import React from 'react';
-import './UserSettings.css';
+import '../styles/UserSettings.css';
 
 function UserSettings() {
 	return (

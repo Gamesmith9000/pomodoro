@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import './TimerScheduler.css';
+import '../styles/TimerScheduler.css';
 import { Timer } from './Timer';
 import UserSettings from './UserSettings';
 

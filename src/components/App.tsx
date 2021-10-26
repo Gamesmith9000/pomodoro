@@ -1,4 +1,4 @@
-import './App.css';
+import '../styles/App.css';
 import { Notifier } from './Notifier';
 import { SeatPosition, TimerScheduler } from './TimerScheduler';
 
