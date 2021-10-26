@@ -3,6 +3,12 @@ import '../styles/TimerScheduler.css';
 import { Timer } from './Timer';
 import UserSettings from './UserSettings';
 
+enum SchedulerStatus {
+	AwaitingStart = "AwaitingStart",
+	Engaged = "Engaged",
+	FullyCompleted = "FullyCompleted"
+}
+
 export enum SeatPosition {
 	Sit = "Sit",
 	Stand = "Stand"
@@ -64,7 +70,7 @@ export const TimerScheduler: FC<TimerSchedulerProps> = (props) => {
 			}
 			
 			notificationMessage +=  newline + `(index ${currentPeriodIndex})`;
-			const notification = new Notification(notificationStrings.title, { body: notificationMessage });
+			new Notification(notificationStrings.title, { body: notificationMessage });
 		}
 
 		if(finalPeriodCompleted === false) {
@@ -112,12 +118,6 @@ const createTimerPeriodsList = (initialPosition: SeatPosition) : TimerPeriod[] =
 		{ durationMinutes: 10, isBreakPeriod: false, seatPosition: initialPosition },
 		{ durationMinutes: 10, isBreakPeriod: true,  seatPosition: alternatePosition }
 	];
-}
-
-enum SchedulerStatus {
-	AwaitingStart = "AwaitingStart",
-	Engaged = "Engaged",
-	FullyCompleted = "FullyCompleted"
 }
 
 interface TimerSchedulerProps {
