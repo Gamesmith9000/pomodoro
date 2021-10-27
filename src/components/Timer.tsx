@@ -37,7 +37,7 @@ export const Timer: FC<TimerProps> = (props) => {
 				props.onPeriodComplete();
 			}
 		}
-	});
+	}, [hasCompletedPeriod, periodHasChanged, props]);
 
 	return (
 		<div>
