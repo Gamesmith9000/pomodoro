@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, Fragment, MouseEvent, useState } from 'react';
 import '../styles/TimerScheduler.css';
 import { Timer } from './Timer';
 import UserSettings from './UserSettings';
@@ -33,12 +33,13 @@ export const TimerScheduler: FC<TimerSchedulerProps> = (props) => {
 	const [isRunningTimer, setIsRunningTimer] = useState(false);
 	const [currentPeriodIndex, setCurrentPeriodIndex] = useState(0);
 	const [schedulerStatus, setSchedulerStatus] = useState(SchedulerStatus.AwaitingStart);
+	const [settingsMenuIsOpen, setSettingsMenuIsOpen] = useState(false);
 
 	const timerPeriods: TimerPeriod[] = createTimerPeriodsList(props.initialSeatPosition);
 	const seatPosition: SeatPosition = timerPeriods[currentPeriodIndex].seatPosition;
 
-	const toggleTimerRunWithButton = (mouseEvent: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-		mouseEvent.preventDefault();
+	const toggleTimerRunWithButton = (event: MouseEvent) => {
+		event.preventDefault();
 		if(schedulerStatus === SchedulerStatus.AwaitingStart) {
 			setSchedulerStatus(SchedulerStatus.Engaged);
 		}
@@ -85,21 +86,37 @@ export const TimerScheduler: FC<TimerSchedulerProps> = (props) => {
 		}
 	}
 	
+	const handleSettingsOpenCloseButton = (event: MouseEvent): void => {
+		event.preventDefault();
+		setSettingsMenuIsOpen(current => !current);
+	}
+
 	return (
 		<div className="TimerScheduler">
-			<div>Position: {seatPosition}</div>
-			{ schedulerStatus !== SchedulerStatus.Engaged &&
+			{ schedulerStatus !== SchedulerStatus.Engaged && settingsMenuIsOpen === true
+			?
 				<UserSettings />
+			:
+				<Fragment>
+					{ schedulerStatus !== SchedulerStatus.Engaged &&
+						<Fragment>
+						<button onClick={handleSettingsOpenCloseButton}>
+								Open/Close Settings
+								</button>
+						</Fragment>
+					}
+					<div>Position: {seatPosition}</div>
+					<button onClick={toggleTimerRunWithButton}>
+						{isRunningTimer === true ? '⏸' : '▶️'}
+					</button>
+					<Timer
+						currentPeriodIndex={currentPeriodIndex}
+						durationSeconds={timerPeriods[currentPeriodIndex].durationMinutes * 60}
+						isRunning={schedulerStatus === SchedulerStatus.Engaged ? isRunningTimer : false}
+						onPeriodComplete={handlePeriodCompleted}
+					/>
+				</Fragment>
 			}
-			<button onClick={toggleTimerRunWithButton}>
-				{isRunningTimer === true ? '⏸' : '▶️'}
-			</button>
-			<Timer
-				currentPeriodIndex={currentPeriodIndex}
-				durationSeconds={timerPeriods[currentPeriodIndex].durationMinutes * 60}
-				isRunning={schedulerStatus === SchedulerStatus.Engaged ? isRunningTimer : false}
-				onPeriodComplete={handlePeriodCompleted}
-			/>
 		</div>
 	);
 }

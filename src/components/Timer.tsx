@@ -27,7 +27,7 @@ export const Timer: FC<TimerProps> = (props) => {
 		else {
 			if (hasCompletedPeriod === false) {
 				if (props.isRunning === true && intervalId.current === 0) {
-					intervalId.current = window.setInterval(() => { setCurrentTime(current => current + 1) }, 1000); ////////////////
+					intervalId.current = window.setInterval(() => { setCurrentTime(current => current + 1) }, 1000);
 				}
 				else if (props.isRunning === false && intervalId.current !== 0) {
 					removeIntervalData();
