@@ -1,7 +1,7 @@
 import React, { FC, Fragment, MouseEvent, useState } from 'react';
 import '../styles/TimerScheduler.css';
 import { Timer } from './Timer';
-import UserSettings from './UserSettings';
+import { SettingsData, UserSettings } from './UserSettings';
 
 enum SchedulerStatus {
 	AwaitingStart = "AwaitingStart",
@@ -29,10 +29,6 @@ export interface TimerPeriod {
 	seatPosition: SeatPosition;
 }
 
-interface TimerSchedulerProps {
-	initialSeatPosition: SeatPosition;
-}
-
 interface NotificationStrings {
 	breakEnd: string;
 	breakStart: string;
@@ -41,6 +37,10 @@ interface NotificationStrings {
 	finalPeriodEnd: string;
 	title: string;
 }
+
+const defaultUserSettings: SettingsData = {
+	startingPosition: SeatPosition.Stand
+};
 
 const notificationStrings: NotificationStrings = {
 	breakEnd: "Resume Work",
@@ -51,13 +51,14 @@ const notificationStrings: NotificationStrings = {
 	title: "Period Ended"
 }
 
-export const TimerScheduler: FC<TimerSchedulerProps> = (props) => {
+export function TimerScheduler () {
 	const [isRunningTimer, setIsRunningTimer] = useState(false);
 	const [currentPeriodIndex, setCurrentPeriodIndex] = useState(0);
 	const [schedulerStatus, setSchedulerStatus] = useState(SchedulerStatus.AwaitingStart);
 	const [settingsMenuIsOpen, setSettingsMenuIsOpen] = useState(false);
+	const [userSettings, setUserSettings] = useState(defaultUserSettings);
 
-	const timerPeriods: TimerPeriod[] = createTimerPeriodsList(props.initialSeatPosition);
+	const timerPeriods: TimerPeriod[] = createTimerPeriodsList(userSettings.startingPosition);
 	const currentTimerPeriod = timerPeriods[currentPeriodIndex];
 
 	const toggleTimerRunWithButton = (event: MouseEvent) => {
@@ -108,6 +109,12 @@ export const TimerScheduler: FC<TimerSchedulerProps> = (props) => {
 		}
 	}
 	
+	const handleSaveNewSettingsButton = (event: MouseEvent, newSettings: SettingsData) => {
+		event.preventDefault();
+		setUserSettings(newSettings);
+		setSettingsMenuIsOpen(false);
+	}
+
 	const handleSettingsOpenCloseButton = (event: MouseEvent): void => {
 		event.preventDefault();
 		setSettingsMenuIsOpen(current => !current);
@@ -117,14 +124,18 @@ export const TimerScheduler: FC<TimerSchedulerProps> = (props) => {
 		<div className="TimerScheduler">
 			{ schedulerStatus !== SchedulerStatus.Engaged && settingsMenuIsOpen === true
 			?
-				<UserSettings />
+				<UserSettings
+					savedSettings={userSettings}
+					onCancelAndExit={handleSettingsOpenCloseButton}
+					onSaveChanges={handleSaveNewSettingsButton}
+				/>
 			:
 				<Fragment>
 					{ schedulerStatus !== SchedulerStatus.Engaged &&
 						<Fragment>
 						<button onClick={handleSettingsOpenCloseButton}>
-								Open/Close Settings
-								</button>
+								Open Settings
+						</button>
 						</Fragment>
 					}
 					<div>{currentTimerPeriod.isBreakPeriod === false ? 'Work' : 'Break'}</div>
