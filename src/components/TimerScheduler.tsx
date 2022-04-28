@@ -14,14 +14,36 @@ export enum SeatPosition {
 	Stand = "Stand"
 }
 
+interface NotificationStrings {
+	breakEnd: string;
+	breakStart: string;
+	changeToSit: string;
+	changeToStand: string;
+	finalPeriodEnd: string;
+	title: string;
+}
+
 export interface TimerPeriod {
 	durationMinutes: number;
 	isBreakPeriod: boolean;
 	seatPosition: SeatPosition;
 }
 
+interface TimerSchedulerProps {
+	initialSeatPosition: SeatPosition;
+}
+
+interface NotificationStrings {
+	breakEnd: string;
+	breakStart: string;
+	changeToSit: string;
+	changeToStand: string;
+	finalPeriodEnd: string;
+	title: string;
+}
+
 const notificationStrings: NotificationStrings = {
-	breakEnd: "Continue Working",
+	breakEnd: "Resume Work",
 	breakStart: "Break Time",
 	changeToSit: "Change Position: Sit Down",
 	changeToStand: "Change Position: Stand Up",
@@ -36,7 +58,7 @@ export const TimerScheduler: FC<TimerSchedulerProps> = (props) => {
 	const [settingsMenuIsOpen, setSettingsMenuIsOpen] = useState(false);
 
 	const timerPeriods: TimerPeriod[] = createTimerPeriodsList(props.initialSeatPosition);
-	const seatPosition: SeatPosition = timerPeriods[currentPeriodIndex].seatPosition;
+	const currentTimerPeriod = timerPeriods[currentPeriodIndex];
 
 	const toggleTimerRunWithButton = (event: MouseEvent) => {
 		event.preventDefault();
@@ -49,8 +71,8 @@ export const TimerScheduler: FC<TimerSchedulerProps> = (props) => {
 	const handlePeriodCompleted = () => {
 		const finalPeriodCompleted = currentPeriodIndex === timerPeriods.length -1;
 
-		if (Notification?.permission === "granted") {
-			let notificationMessage: string = "";
+		if (Notification?.permission === 'granted') {
+			let notificationMessage: string = '';
 			const newline: string = '\n';
 
 			if(finalPeriodCompleted === false) {
@@ -105,13 +127,14 @@ export const TimerScheduler: FC<TimerSchedulerProps> = (props) => {
 								</button>
 						</Fragment>
 					}
-					<div>Position: {seatPosition}</div>
+					<div>{currentTimerPeriod.isBreakPeriod === false ? 'Work' : 'Break'}</div>
+					<div>Position: {currentTimerPeriod.seatPosition}</div>
 					<button onClick={toggleTimerRunWithButton}>
 						{isRunningTimer === true ? '⏸' : '▶️'}
 					</button>
 					<Timer
 						currentPeriodIndex={currentPeriodIndex}
-						durationSeconds={timerPeriods[currentPeriodIndex].durationMinutes * 60}
+						durationSeconds={currentTimerPeriod.durationMinutes * 60}
 						isRunning={schedulerStatus === SchedulerStatus.Engaged ? isRunningTimer : false}
 						onPeriodComplete={handlePeriodCompleted}
 					/>
@@ -135,17 +158,4 @@ const createTimerPeriodsList = (initialPosition: SeatPosition) : TimerPeriod[] =
 		{ durationMinutes: 10, isBreakPeriod: false, seatPosition: initialPosition },
 		{ durationMinutes: 10, isBreakPeriod: true,  seatPosition: alternatePosition }
 	];
-}
-
-interface TimerSchedulerProps {
-	initialSeatPosition: SeatPosition;
-}
-
-interface NotificationStrings {
-	breakEnd: string;
-	breakStart: string;
-	changeToSit: string;
-	changeToStand: string;
-	finalPeriodEnd: string;
-	title: string;
 }
